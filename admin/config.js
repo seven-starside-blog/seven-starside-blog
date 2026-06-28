@@ -7,13 +7,14 @@ const BLOG_CONFIG = {
   // Google Cloud Console → 認証情報 → OAuth 2.0クライアントID
   GOOGLE_CLIENT_ID: '397689264617-36pe13a2tifj1re997q0i1gtvaqrfd3h.apps.googleusercontent.com',
 
-  // GitHubユーザー名（例: tanaka）
+  // GitHubユーザー名
   GITHUB_USERNAME: 'seven-starside-blog',
 
-  // GitHubリポジトリ名（例: my-blog）
+  // GitHubリポジトリ名
   GITHUB_REPO: 'seven-starside-blog',
 
-  // 許可するGoogleアカウントのメールアドレス（自分のアカウントだけ）
+  // ★★ 必須：ここを自分のGmailに変えないとログイン制限が効きません ★★
+  // ここが 'your-email@gmail.com' のままだと誰でもログインできてしまいます
   ALLOWED_EMAIL: 'seven.starside.admin@gmail.com',
 };
 
