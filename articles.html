@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>記事一覧 | seven-starside-blog</title>
+<link rel="stylesheet" href="/seven-starside-blog/assets/style.css">
+<script src="/seven-starside-blog/admin/config.js"></script>
+<style>
+  .page-hero {
+    background: linear-gradient(160deg, var(--red-900), #2a0404);
+    padding: 44px 20px 36px;
+    color: #fff;
+  }
+  .page-hero h1 { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+  .page-hero p  { font-size: 13px; color: rgba(255,255,255,0.55); }
+
+  /* 検索バー */
+  .search-area {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+    position: sticky;
+    top: var(--header-h);
+    z-index: 10;
+  }
+  .search-wrap {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  }
+  .search-input-wrap {
+    position: relative; flex: 1; min-width: 200px;
+  }
+  .search-input-wrap svg {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    width: 16px; height: 16px; color: var(--text-muted); pointer-events: none;
+  }
+  #search-input {
+    width: 100%; padding: 9px 12px 9px 36px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); color: var(--text);
+    font-size: 14px; font-family: inherit; outline: none;
+    transition: border-color 0.15s;
+  }
+  #search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(204,34,34,0.1); }
+  .search-clear {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: var(--text-muted);
+    font-size: 16px; padding: 2px; display: none;
+  }
+  .search-clear.show { display: block; }
+
+  /* タグフィルター */
+  .tag-filter {
+    padding: 12px 0 0;
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  }
+  .tag-filter-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-right: 2px; }
+
+  /* ソート */
+  #sort-select {
+    padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); color: var(--text); font-size: 13px; font-family: inherit; outline: none;
+  }
+
+  /* 記事グリッド */
+  .articles-section { padding: 28px 0 60px; }
+  .result-info { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  .result-info strong { color: var(--text); }
+  .articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+  /* 広告（一覧中間） */
+  .ad-inline { grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/seven-starside-blog/" class="logo">seven<span>★</span>starside</a>
+  <button class="hamburger" id="hamburgerBtn" aria-label="メニューを開く">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<main class="page-body">
+  <div class="page-hero">
+    <div class="container">
+      <h1>記事一覧</h1>
+      <p id="article-count">読み込み中...</p>
+    </div>
+  </div>
+
+  <!-- 検索 -->
+  <div class="search-area">
+    <div class="container">
+      <div class="search-wrap">
+        <div class="search-input-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-input" placeholder="記事を検索..." autocomplete="off">
+          <button class="search-clear" id="search-clear" onclick="clearSearch()">×</button>
+        </div>
+        <select id="sort-select" onchange="renderArticles()">
+          <option value="date-desc">新しい順</option>
+          <option value="date-asc">古い順</option>
+          <option value="title-asc">タイトル順</option>
+        </select>
+      </div>
+      <div class="tag-filter" id="tag-filter"></div>
+    </div>
+  </div>
+
+  <!-- 記事リスト -->
+  <div class="articles-section">
+    <div class="container">
+      <!-- 広告（上部） -->
+      <div class="ad-unit">広告スペース（横長）</div>
+
+      <div class="result-info" id="result-info"></div>
+      <div class="articles-grid" id="articles-grid">
+        <div class="loading-spinner" style="grid-column:1/-1"><div class="spinner"></div><span>読み込み中...</span></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="/seven-starside-blog/">トップ</a>
+    <a href="/seven-starside-blog/about.html">自己紹介</a>
+    <a href="/seven-starside-blog/articles.html">記事一覧</a>
+  </div>
+  <div>© 2025 seven-starside-blog</div>
+</footer>
+
+<script src="/seven-starside-blog/assets/app.js"></script>
+<script>
+initDrawer('articles.html');
+
+let allArticles = [];
+let activeTag = '';
+
+// URLパラメータからタグ・検索ワードを引き継ぐ
+const urlParams = new URLSearchParams(location.search);
+if (urlParams.get('tag'))    activeTag = urlParams.get('tag');
+if (urlParams.get('search')) document.getElementById('search-input').value = urlParams.get('search');
+
+(async () => {
+  allArticles = await fetchArticles();
+  document.getElementById('article-count').textContent = `全 ${allArticles.length} 件`;
+
+  // タグ一覧生成
+  const allTags = [...new Set(allArticles.flatMap(a => a.tags || []))];
+  const tagFilter = document.getElementById('tag-filter');
+  tagFilter.innerHTML = `<span class="tag-filter-label">タグ：</span>
+    <button class="tag ${!activeTag ? 'active' : ''}" onclick="setTag('')">すべて</button>` +
+    allTags.map(t => `<button class="tag ${activeTag === t ? 'active' : ''}" onclick="setTag('${t}')">${t}</button>`).join('');
+
+  renderArticles();
+})();
+
+function setTag(tag) {
+  activeTag = tag;
+  document.querySelectorAll('.tag-filter .tag').forEach(el => {
+    el.classList.toggle('active', el.textContent === tag || (tag === '' && el.textContent === 'すべて'));
+  });
+  renderArticles();
+}
+
+document.getElementById('search-input').addEventListener('input', function() {
+  document.getElementById('search-clear').classList.toggle('show', !!this.value);
+  renderArticles();
+});
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-clear').classList.remove('show');
+  renderArticles();
+}
+
+function renderArticles() {
+  const q    = document.getElementById('search-input').value.trim().toLowerCase();
+  const sort = document.getElementById('sort-select').value;
+
+  let filtered = allArticles.filter(a => {
+    const matchTag  = !activeTag || (a.tags || []).includes(activeTag);
+    const matchWord = !q || a.title.toLowerCase().includes(q) ||
+                      (a.excerpt || '').toLowerCase().includes(q) ||
+                      (a.tags || []).some(t => t.toLowerCase().includes(q));
+    return matchTag && matchWord;
+  });
+
+  filtered.sort((a, b) => {
+    if (sort === 'date-desc') return new Date(b.date) - new Date(a.date);
+    if (sort === 'date-asc')  return new Date(a.date) - new Date(b.date);
+    return a.title.localeCompare(b.title, 'ja');
+  });
+
+  const info = document.getElementById('result-info');
+  info.innerHTML = filtered.length
+    ? `<strong>${filtered.length}</strong> 件の記事${q ? `（"${q}" の検索結果）` : ''}${activeTag ? `　タグ：<span class="tag active" style="cursor:default">${activeTag}</span>` : ''}`
+    : '';
+
+  const grid = document.getElementById('articles-grid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><p>条件に合う記事が見つかりませんでした</p></div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map((a, i) => {
+    // 6件ごとに広告を挿入
+    const ad = (i > 0 && i % 6 === 0)
+      ? `<div class="ad-unit ad-inline">広告スペース</div>`
+      : '';
+    return ad + `
+      <a href="/seven-starside-blog/article.html?id=${a.id}" class="article-card">
+        <div class="thumb">${a.thumbnail ? `<img src="${a.thumbnail}" alt="">` : '✦'}</div>
+        <div class="card-body">
+          <div class="card-date">${formatDate(a.date)}</div>
+          <div class="card-title">${highlight(a.title, q)}</div>
+          <div class="card-excerpt">${highlight(a.excerpt || '', q)}</div>
+          <div class="card-tags">${(a.tags||[]).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        </div>
+      </a>`;
+  }).join('');
+}
+
+// 検索ワードをハイライト
+function highlight(text, q) {
+  if (!q || !text) return text;
+  return text.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'),
+    m => `<mark style="background:var(--red-100);color:var(--red-800);border-radius:2px;padding:0 1px;">${m}</mark>`);
+}
+</script>
+</body>
+</html>
