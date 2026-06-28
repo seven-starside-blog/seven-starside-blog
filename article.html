@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>記事 | seven-starside-blog</title>
+<link rel="stylesheet" href="/seven-starside-blog/assets/style.css">
+<script src="/seven-starside-blog/admin/config.js"></script>
+<style>
+  /* 記事ヘッダー */
+  .article-hero {
+    background: linear-gradient(160deg, var(--red-900), #2a0404);
+    padding: 48px 20px 40px;
+    color: #fff;
+  }
+  .article-hero .meta {
+    font-size: 12px; color: rgba(255,255,255,0.5);
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .article-hero .meta a { color: rgba(255,255,255,0.65); }
+  .article-hero .meta a:hover { color: #fff; }
+  .article-hero h1 { font-size: clamp(22px, 4vw, 34px); font-weight: 800; line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .article-hero .hero-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .article-hero .hero-tags .tag { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); }
+  .article-hero .hero-tags .tag:hover { background: rgba(255,255,255,0.2); }
+
+  /* サムネイル */
+  .article-thumb {
+    width: 100%; max-height: 400px; object-fit: cover;
+    display: block;
+  }
+
+  /* レイアウト */
+  .article-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 36px 0 60px;
+  }
+  @media (min-width: 900px) {
+    .article-layout { grid-template-columns: 1fr 240px; }
+  }
+
+  /* 本文 */
+  .article-body { font-size: 16px; line-height: 1.9; color: var(--text); }
+  .article-body h1 { font-size: 24px; font-weight: 700; margin: 32px 0 12px; }
+  .article-body h2 {
+    font-size: 20px; font-weight: 700; margin: 28px 0 10px;
+    padding-bottom: 6px; border-bottom: 2px solid var(--red-200);
+    color: var(--text);
+  }
+  .article-body h3 { font-size: 17px; font-weight: 700; margin: 20px 0 8px; }
+  .article-body p  { margin: 0 0 16px; }
+  .article-body strong { color: var(--accent); font-weight: 700; }
+  .article-body em { font-style: italic; }
+  .article-body a  { color: var(--accent); text-decoration: underline; }
+  .article-body a:hover { opacity: 0.8; }
+  .article-body blockquote {
+    border-left: 3px solid var(--red-400);
+    padding: 8px 16px; margin: 16px 0;
+    background: var(--red-50); color: var(--text-muted);
+    border-radius: 0 6px 6px 0;
+  }
+  .article-body code {
+    background: var(--gray-100); border: 1px solid var(--gray-200);
+    border-radius: 4px; padding: 2px 6px;
+    font-family: 'Menlo', monospace; font-size: 13px;
+  }
+  .article-body pre {
+    background: var(--gray-900); color: #e0e0e0;
+    padding: 16px; border-radius: 8px; overflow-x: auto; margin: 16px 0;
+  }
+  .article-body pre code { background: none; border: none; color: inherit; }
+  .article-body ul, .article-body ol { padding-left: 24px; margin: 8px 0 16px; }
+  .article-body li { margin-bottom: 4px; }
+  .article-body img { border-radius: 8px; margin: 16px 0; max-width: 100%; }
+  .article-body hr { border: none; border-top: 2px solid var(--red-100); margin: 24px 0; }
+  .article-body table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  .article-body th, .article-body td { padding: 10px 12px; border: 1px solid var(--border); text-align: left; }
+  .article-body th { background: var(--gray-100); font-weight: 600; }
+
+  /* タグセクション */
+  .article-tags-section { margin: 32px 0 0; padding-top: 20px; border-top: 1px solid var(--border); }
+  .article-tags-section .label { font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .article-tags-section .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  /* 広告（記事内） */
+  .article-ad { margin: 36px 0; }
+
+  /* 前後ナビ */
+  .article-nav {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin-top: 36px;
+  }
+  .nav-btn {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 4px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    text-decoration: none; color: inherit;
+  }
+  .nav-btn:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(204,34,34,0.1); }
+  .nav-btn .nav-dir { font-size: 11px; color: var(--accent); font-weight: 600; }
+  .nav-btn .nav-title { font-size: 13px; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .nav-btn.next { text-align: right; }
+  .nav-btn.prev { text-align: left; }
+
+  /* おすすめ記事 */
+  .recommend-section { margin-top: 40px; }
+  .recommend-section h2 { font-size: 16px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .recommend-section h2 span { color: var(--accent); }
+  .recommend-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+
+  .recommend-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px;
+    display: flex; gap: 12px; align-items: flex-start;
+    text-decoration: none; color: inherit;
+    transition: border-color 0.15s;
+  }
+  .recommend-card:hover { border-color: var(--accent); }
+  .recommend-card .thumb-mini {
+    width: 64px; height: 48px; border-radius: 5px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--red-900), var(--red-700));
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.3); font-size: 18px; overflow: hidden;
+  }
+  .recommend-card .thumb-mini img { width: 100%; height: 100%; object-fit: cover; }
+  .recommend-card .info .date { font-size: 11px; color: var(--text-muted); }
+  .recommend-card .info .title { font-size: 13px; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* サイドバー */
+  .sidebar { display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .sidebar-card h3 { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 12px; letter-spacing: 0.03em; }
+  .toc-list { list-style: none; padding: 0; font-size: 13px; }
+  .toc-list li { padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .toc-list li:last-child { border-bottom: none; }
+  .toc-list a { color: var(--text-muted); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .toc-list a:hover { color: var(--accent); }
+  .sidebar-sticky { position: sticky; top: calc(var(--header-h) + 16px); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/seven-starside-blog/" class="logo">seven<span>★</span>starside</a>
+  <button class="hamburger" id="hamburgerBtn" aria-label="メニューを開く">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<main class="page-body" id="main-content">
+  <div class="loading-spinner" style="padding:80px 0">
+    <div class="spinner"></div><span>読み込み中...</span>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="/seven-starside-blog/">トップ</a>
+    <a href="/seven-starside-blog/about.html">自己紹介</a>
+    <a href="/seven-starside-blog/articles.html">記事一覧</a>
+  </div>
+  <div>© 2025 seven-starside-blog</div>
+</footer>
+
+<script src="/seven-starside-blog/assets/app.js"></script>
+<script>
+initDrawer('articles.html');
+
+(async () => {
+  const params  = new URLSearchParams(location.search);
+  const id      = params.get('id');
+  const articles = await fetchArticles();
+  const idx     = articles.findIndex(a => a.id === id);
+  const article = articles[idx];
+
+  const main = document.getElementById('main-content');
+
+  if (!article) {
+    main.innerHTML = `
+      <div class="empty-state" style="padding:80px 20px">
+        <div class="icon">😕</div>
+        <p>記事が見つかりませんでした</p>
+        <a href="/seven-starside-blog/articles.html" style="color:var(--accent);font-size:13px;margin-top:12px;display:inline-block;">← 記事一覧に戻る</a>
+      </div>`;
+    return;
+  }
+
+  // ページタイトル設定
+  document.title = `${article.title} | seven-starside-blog`;
+
+  // 前後記事
+  const prev = idx < articles.length - 1 ? articles[idx + 1] : null;
+  const next = idx > 0 ? articles[idx - 1] : null;
+
+  // おすすめ（同タグの別記事 or ランダム3件）
+  const recommends = articles
+    .filter(a => a.id !== id)
+    .filter(a => (a.tags||[]).some(t => (article.tags||[]).includes(t)))
+    .slice(0, 3);
+  const fillCount = 3 - recommends.length;
+  if (fillCount > 0) {
+    articles.filter(a => a.id !== id && !recommends.includes(a)).slice(0, fillCount)
+      .forEach(a => recommends.push(a));
+  }
+
+  // 目次（h2タグから生成）
+  const tocMatches = [...(article.content.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi))];
+  const tocHTML = tocMatches.length
+    ? `<div class="sidebar-card">
+        <h3>目次</h3>
+        <ul class="toc-list">
+          ${tocMatches.map((m,i) => `<li><a href="#heading-${i}">${m[1]}</a></li>`).join('')}
+        </ul>
+       </div>`
+    : '';
+
+  // 本文のh2にIDを付与
+  let bodyHTML = article.content.replace(/<h2([^>]*)>(.*?)<\/h2>/gi, (_, attr, text, offset) => {
+    const idx2 = [...(article.content.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi))].findIndex(m => m.index === offset);
+    return `<h2${attr} id="heading-${idx2}">${text}</h2>`;
+  });
+
+  main.innerHTML = `
+    <!-- ヒーロー -->
+    <div class="article-hero">
+      <div class="container">
+        <div class="meta">
+          <a href="/seven-starside-blog/articles.html">記事一覧</a>
+          <span>›</span>
+          <span>${formatDate(article.date)}</span>
+        </div>
+        <h1>${article.title}</h1>
+        <div class="hero-tags">
+          ${(article.tags||[]).map(t =>
+            `<a href="/seven-starside-blog/articles.html?tag=${encodeURIComponent(t)}" class="tag">${t}</a>`
+          ).join('')}
+        </div>
+      </div>
+    </div>
+
+    ${article.thumbnail ? `<img src="${article.thumbnail}" class="article-thumb" alt="${article.title}">` : ''}
+
+    <!-- 本文レイアウト -->
+    <div class="container">
+      <div class="article-layout">
+        <!-- メインコンテンツ -->
+        <div>
+          <!-- 広告（本文上） -->
+          <div class="ad-unit article-ad">広告スペース</div>
+
+          <article class="article-body">${bodyHTML}</article>
+
+          <!-- タグ -->
+          <div class="article-tags-section">
+            <div class="label">タグ</div>
+            <div class="tags">
+              ${(article.tags||[]).map(t =>
+                `<a href="/seven-starside-blog/articles.html?tag=${encodeURIComponent(t)}" class="tag">${t}</a>`
+              ).join('')}
+            </div>
+          </div>
+
+          <!-- 広告（本文下） -->
+          <div class="ad-unit article-ad">広告スペース</div>
+
+          <!-- 前後ナビ -->
+          <nav class="article-nav">
+            ${prev ? `<a href="/seven-starside-blog/article.html?id=${prev.id}" class="nav-btn prev">
+              <span class="nav-dir">← 前の記事</span>
+              <span class="nav-title">${prev.title}</span>
+            </a>` : '<div></div>'}
+            ${next ? `<a href="/seven-starside-blog/article.html?id=${next.id}" class="nav-btn next">
+              <span class="nav-dir">次の記事 →</span>
+              <span class="nav-title">${next.title}</span>
+            </a>` : '<div></div>'}
+          </nav>
+
+          <!-- おすすめ記事 -->
+          ${recommends.length ? `
+          <div class="recommend-section">
+            <h2><span>★</span> おすすめ記事</h2>
+            <div class="recommend-grid">
+              ${recommends.map(a => `
+                <a href="/seven-starside-blog/article.html?id=${a.id}" class="recommend-card">
+                  <div class="thumb-mini">${a.thumbnail ? `<img src="${a.thumbnail}" alt="">` : '✦'}</div>
+                  <div class="info">
+                    <div class="date">${formatDate(a.date)}</div>
+                    <div class="title">${a.title}</div>
+                  </div>
+                </a>`).join('')}
+            </div>
+          </div>` : ''}
+        </div>
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+          <div class="sidebar-sticky">
+            ${tocHTML}
+            <div class="ad-unit" style="min-height:250px;flex-direction:column;gap:4px;">
+              <div>広告スペース</div><div style="font-size:11px;">(サイドバー)</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  `;
+})();
+</script>
+</body>
+</html>
