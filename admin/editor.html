@@ -237,6 +237,12 @@
     color: var(--text);
     font-family: var(--font);
   }
+  /* テキスト選択時の色を明示（デフォルトで文字が見えなくなる問題を防ぐ） */
+  #edit-area::selection,
+  #edit-area *::selection {
+    background: rgba(204, 34, 34, 0.25);
+    color: var(--text);
+  }
   #edit-area:empty::before {
     content: '本文を入力してください…';
     color: var(--gray-300);
@@ -738,7 +744,7 @@
       </div>
 
       <!-- コンテンツエリア（編集 + プレビュー） -->
-      <div id="edit-area" contenteditable="true" id="editor" style="min-height:420px;padding:16px;outline:none;font-size:15px;line-height:1.8;color:var(--text);font-family:var(--font);" data-placeholder="本文を入力してください…"></div>
+      <div id="edit-area" contenteditable="true" data-placeholder="本文を入力してください…"></div>
 
       <!-- 文字数 -->
       <div class="word-count">
@@ -922,9 +928,14 @@ function applyBlockStyle(tag) {
   } else {
     // 新しい要素に内容を移してstyle/class完全リセット
     const newEl = document.createElement(tag);
-    // innerHTML（太字などインライン書式）をそのまま引き継ぐ
     newEl.innerHTML = node.innerHTML || '';
-    // style・classは一切引き継がない
+    // 子孫のインラインstyle・classをすべて除去（行間・フォントサイズ残留を防ぐ）
+    newEl.removeAttribute('style');
+    newEl.removeAttribute('class');
+    newEl.querySelectorAll('[style],[class]').forEach(el => {
+      el.removeAttribute('style');
+      el.removeAttribute('class');
+    });
     node.replaceWith(newEl);
     // カーソルを末尾に
     const r = document.createRange();
