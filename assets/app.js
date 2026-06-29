@@ -2,23 +2,38 @@
    app.js — 共通JS（記事データ読み込み・ヘッダー）
    ============================================= */
 
+/**
+ * リポジトリのベースパスを確実に返す
+ * GitHub Pages: https://user.github.io/repo/ → "/repo"
+ * ローカル:     http://localhost/             → ""
+ */
 const REPO_BASE = (() => {
-  if (typeof BLOG_CONFIG !== 'undefined') {
-    return `https://${BLOG_CONFIG.GITHUB_USERNAME}.github.io/${BLOG_CONFIG.GITHUB_REPO}`;
+  // BLOG_CONFIGがあればそちらを優先
+  if (typeof BLOG_CONFIG !== 'undefined' && BLOG_CONFIG.GITHUB_REPO) {
+    return '/' + BLOG_CONFIG.GITHUB_REPO;
   }
-  // config.jsがない場合はパスから自動推定
-  const path = location.pathname.split('/').slice(0, -1).join('/');
-  return location.origin + (path.startsWith('/admin') ? path.replace('/admin','') : path);
+  // なければURLの第1セグメントをリポジトリ名として使う
+  // 例: /seven-starside-blog/about.html → "/seven-starside-blog"
+  //     /index.html                     → ""（ローカルやカスタムドメイン）
+  const seg = location.pathname.split('/').filter(Boolean)[0];
+  // admin配下のページは1つ上のセグメントが repo名
+  if (location.pathname.includes('/admin/')) {
+    const parts = location.pathname.split('/').filter(Boolean);
+    return parts.length >= 2 ? '/' + parts[0] : '';
+  }
+  // GitHub Pagesは必ず /reponame/ というパスになる
+  // ただしルートデプロイ（user.github.io）は seg がファイル名になるため除外
+  if (seg && !seg.includes('.')) {
+    return '/' + seg;
+  }
+  return '';
 })();
 
 // 記事データをフェッチ（GitHub Pages上のJSONを読む）
 async function fetchArticles() {
   try {
-    const base = typeof BLOG_CONFIG !== 'undefined'
-      ? `/${BLOG_CONFIG.GITHUB_REPO}`
-      : '';
-    const res = await fetch(`${base}/data/articles.json?_=${Date.now()}`);
-    if (!res.ok) throw new Error('fetch failed');
+    const res = await fetch(`${REPO_BASE}/data/articles.json?_=${Date.now()}`);
+    if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
     const json = await res.json();
     return (json.articles || []).filter(a => a.status === 'published');
   } catch(e) {
@@ -42,7 +57,7 @@ function initDrawer(activePage) {
     { href: 'articles.html', label: '記事一覧', icon: '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>' },
   ];
 
-  const base = typeof BLOG_CONFIG !== 'undefined' ? `/${BLOG_CONFIG.GITHUB_REPO}/` : '/';
+  const base = (typeof REPO_BASE !== 'undefined' ? REPO_BASE : '') + '/';
 
   document.body.insertAdjacentHTML('beforeend', `
     <div class="drawer-overlay" id="drawerOverlay"></div>
