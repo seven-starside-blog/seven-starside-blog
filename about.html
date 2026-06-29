@@ -90,4 +90,94 @@
             <div class="sns-grid" id="sns-grid"></div>
           </div>
 
-         
+          <div class="ad-unit">広告スペース</div>
+        </div>
+
+        <!-- サイドバー -->
+        <div>
+          <div class="sidebar-sticky">
+            <div class="profile-card" style="text-align:center;" id="sidebar-card">
+              <div style="font-size:48px;margin-bottom:12px;" id="sidebar-avatar">★</div>
+              <div style="font-size:16px;font-weight:700;margin-bottom:4px;" id="sidebar-name">seven-starside</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;" id="sidebar-tagline">ブログ管理人</div>
+              <a href="/seven-starside-blog/articles.html" style="display:block;padding:9px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-align:center;">記事一覧を見る</a>
+            </div>
+            <div class="ad-unit" style="min-height:250px;flex-direction:column;gap:4px;"><div>広告スペース</div><div style="font-size:11px;">(サイドバー)</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="/seven-starside-blog/">トップ</a>
+    <a href="/seven-starside-blog/about.html">自己紹介</a>
+    <a href="/seven-starside-blog/articles.html">記事一覧</a>
+  </div>
+  <div>© 2025 seven-starside-blog</div>
+</footer>
+
+<script src="/seven-starside-blog/assets/app.js"></script>
+<script>
+initDrawer('about.html');
+
+const SNS_ICONS = {
+  x:'𝕏', instagram:'📷', youtube:'▶', github:'⌥', bluesky:'🦋',
+  tiktok:'♪', note:'📓', threads:'🧵', facebook:'f', linkedin:'in',
+  website:'🌐', other:'🔗'
+};
+const SNS_LABELS = {
+  x:'X', instagram:'Instagram', youtube:'YouTube', github:'GitHub',
+  bluesky:'Bluesky', tiktok:'TikTok', note:'note', threads:'Threads',
+  facebook:'Facebook', linkedin:'LinkedIn', website:'Webサイト', other:'リンク'
+};
+
+(async () => {
+  try {
+    const base = typeof BLOG_CONFIG !== 'undefined' ? `/${BLOG_CONFIG.GITHUB_REPO}` : '';
+    const res = await fetch(`${base}/data/profile.json?_=${Date.now()}`);
+    const p = await res.json();
+
+    // ヒーロー
+    document.getElementById('hero-name').textContent    = p.name    || 'seven-starside';
+    document.getElementById('hero-tagline').textContent = p.tagline || 'ブログ管理人';
+    document.getElementById('sidebar-name').textContent    = p.name    || 'seven-starside';
+    document.getElementById('sidebar-tagline').textContent = p.tagline || 'ブログ管理人';
+    if (p.avatar) {
+      document.getElementById('avatar-el').innerHTML = `<img src="${p.avatar}" alt="${p.name}">`;
+      document.getElementById('sidebar-avatar').innerHTML = `<img src="${p.avatar}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;">`;
+    }
+
+    // 自己紹介文
+    document.getElementById('intro-text').innerHTML = p.intro || '<p>自己紹介はまだ設定されていません。</p>';
+
+    // プロフィール行
+    const rows = p.profile || [];
+    if (rows.length) {
+      document.getElementById('profile-table').innerHTML =
+        rows.map(r => `<tr><th>${r.label}</th><td>${r.value}</td></tr>`).join('');
+    } else {
+      document.getElementById('profile-card').style.display = 'none';
+    }
+
+    // SNS
+    const snsLinks = (p.sns || []).filter(s => s.url);
+    if (snsLinks.length) {
+      document.getElementById('sns-card').style.display = 'block';
+      document.getElementById('sns-grid').innerHTML = snsLinks.map(s => {
+        const icon  = SNS_ICONS[s.service]  || '🔗';
+        const label = s.label || SNS_LABELS[s.service] || s.service;
+        return `<a href="${s.url}" target="_blank" rel="noopener noreferrer" class="sns-btn" data-service="${s.service}">
+          <span class="sns-icon">${icon}</span>${label}
+        </a>`;
+      }).join('');
+    }
+  } catch(e) {
+    document.getElementById('intro-text').innerHTML = '<p>プロフィールの読み込みに失敗しました。</p>';
+  }
+})();
+</script>
+</body>
+</html>
