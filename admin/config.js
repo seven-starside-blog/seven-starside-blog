@@ -18,6 +18,11 @@ const BLOG_CONFIG = {
   ALLOWED_EMAIL: 'seven.starside.admin@gmail.com',
 };
 
+  // ★★ Cloudflare WorkerのURL（デプロイ後に書き換え）
+  // 例: 'https://blog-api.yourname.workers.dev'
+  WORKER_URL: 'https://sss-blog.seven-starside-admin.workers.dev/',
+};
+ 
 // ベースURL（自動計算 - 変更不要）
-BLOG_CONFIG.BASE_URL = `https://${BLOG_CONFIG.GITHUB_USERNAME}.github.io/${BLOG_CONFIG.GITHUB_REPO}`;
+BLOG_CONFIG.BASE_URL    = `https://${BLOG_CONFIG.GITHUB_USERNAME}.github.io/${BLOG_CONFIG.GITHUB_REPO}`;
 BLOG_CONFIG.REDIRECT_URI = `${BLOG_CONFIG.BASE_URL}/admin/callback.html`;
