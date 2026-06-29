@@ -621,45 +621,65 @@
 
     <!-- 挿入タイプ選択 -->
     <div style="display:flex;gap:6px;margin-bottom:14px;">
-      <button class="link-type-btn active" onclick="setLinkType('card')" id="type-card"
+      <button onclick="setLinkType('card')" id="type-card"
         style="flex:1;padding:7px;border:1.5px solid var(--accent);border-radius:7px;background:var(--red-50);color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">
-        🔗 カード形式
+        🔗 カード
       </button>
-      <button class="link-type-btn" onclick="setLinkType('inline')" id="type-inline"
+      <button onclick="setLinkType('inline')" id="type-inline"
         style="flex:1;padding:7px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">
-        📝 テキストリンク
+        📝 テキスト
+      </button>
+      <button onclick="setLinkType('internal')" id="type-internal"
+        style="flex:1;padding:7px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">
+        📄 サイト内
       </button>
     </div>
 
-    <div class="field">
-      <label>URL</label>
-      <div style="display:flex;gap:6px;">
-        <input type="text" id="link-url" placeholder="https://..." style="flex:1;">
-        <button onclick="fetchOgp()" id="ogp-fetch-btn"
-          style="padding:0 12px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.15s;">
-          取得
-        </button>
-      </div>
-    </div>
-
-    <!-- OGPプレビュー -->
-    <div id="ogp-preview" style="display:none;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px;background:var(--gray-50);">
-      <div style="display:flex;gap:0;">
-        <img id="ogp-image" src="" alt="" style="width:90px;height:72px;object-fit:cover;flex-shrink:0;display:none;">
-        <div style="padding:10px 12px;min-width:0;flex:1;">
-          <div id="ogp-title" style="font-size:13px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
-          <div id="ogp-desc"  style="font-size:11px;color:var(--text-muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;"></div>
-          <div id="ogp-site"  style="font-size:11px;color:var(--accent);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+    <!-- 外部リンク（カード・テキスト共通） -->
+    <div id="external-link-area">
+      <div class="field">
+        <label>URL</label>
+        <div style="display:flex;gap:6px;">
+          <input type="text" id="link-url" placeholder="https://..." style="flex:1;">
+          <button onclick="fetchOgp()" id="ogp-fetch-btn"
+            style="padding:0 12px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.15s;">
+            取得
+          </button>
         </div>
       </div>
+      <!-- OGPプレビュー -->
+      <div id="ogp-preview" style="display:none;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px;background:var(--gray-50);">
+        <div style="display:flex;gap:0;">
+          <img id="ogp-image" src="" alt="" style="width:90px;height:72px;object-fit:cover;flex-shrink:0;display:none;">
+          <div style="padding:10px 12px;min-width:0;flex:1;">
+            <div id="ogp-title" style="font-size:13px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+            <div id="ogp-desc"  style="font-size:11px;color:var(--text-muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;"></div>
+            <div id="ogp-site"  style="font-size:11px;color:var(--accent);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+          </div>
+        </div>
+      </div>
+      <div id="ogp-loading" style="display:none;text-align:center;padding:12px;font-size:12px;color:var(--text-muted);">OGP情報を取得中...</div>
+      <div id="ogp-error"   style="display:none;font-size:12px;color:var(--red-600);margin-bottom:10px;padding:8px;background:var(--red-50);border-radius:6px;"></div>
+      <!-- テキストリンク用 -->
+      <div class="field" id="link-text-field" style="display:none;">
+        <label>表示テキスト</label>
+        <input type="text" id="link-text" placeholder="リンクテキスト">
+      </div>
     </div>
-    <div id="ogp-loading" style="display:none;text-align:center;padding:12px;font-size:12px;color:var(--text-muted);">OGP情報を取得中...</div>
-    <div id="ogp-error"   style="display:none;font-size:12px;color:var(--red-600);margin-bottom:10px;padding:8px;background:var(--red-50);border-radius:6px;"></div>
 
-    <!-- テキストリンク用テキスト入力 -->
-    <div class="field" id="link-text-field" style="display:none;">
-      <label>表示テキスト</label>
-      <input type="text" id="link-text" placeholder="リンクテキスト">
+    <!-- サイト内リンク -->
+    <div id="internal-link-area" style="display:none;">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">記事を選択してください</div>
+      <input type="text" id="internal-search" placeholder="記事を検索..."
+        oninput="filterInternalArticles()"
+        style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;margin-bottom:8px;">
+      <div id="internal-article-list"
+        style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:7px;background:var(--bg);">
+        <div style="padding:12px;text-align:center;font-size:12px;color:var(--text-muted);">読み込み中...</div>
+      </div>
+      <div id="internal-selected"
+        style="display:none;margin-top:8px;padding:8px 10px;background:var(--red-50);border:1px solid var(--red-100);border-radius:6px;font-size:12px;color:var(--red-700);">
+      </div>
     </div>
 
     <div class="modal-actions">
@@ -1023,13 +1043,30 @@ let ogpData  = null;
 
 function setLinkType(type) {
   linkType = type;
-  document.getElementById('type-card').style.cssText   = type === 'card'
-    ? 'flex:1;padding:7px;border:1.5px solid var(--accent);border-radius:7px;background:var(--red-50);color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;'
-    : 'flex:1;padding:7px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;';
-  document.getElementById('type-inline').style.cssText = type === 'inline'
-    ? 'flex:1;padding:7px;border:1.5px solid var(--accent);border-radius:7px;background:var(--red-50);color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;'
-    : 'flex:1;padding:7px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;';
+  const A = 'flex:1;padding:7px;border:1.5px solid var(--accent);border-radius:7px;background:var(--red-50);color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;';
+  const I = 'flex:1;padding:7px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;';
+  document.getElementById('type-card').style.cssText     = type === 'card'     ? A : I;
+  document.getElementById('type-inline').style.cssText   = type === 'inline'   ? A : I;
+  document.getElementById('type-internal').style.cssText = type === 'internal' ? A : I;
+
+  // 外部リンクエリア
+  const extArea  = document.getElementById('external-link-area');
+  const intArea  = document.getElementById('internal-link-area');
+  extArea.style.display = type === 'internal' ? 'none' : 'block';
+  intArea.style.display = type === 'internal' ? 'block' : 'none';
+
+  // テキストリンク用テキスト入力
   document.getElementById('link-text-field').style.display = type === 'inline' ? 'block' : 'none';
+
+  // サイト内リンク選択時は記事リストをロード
+  if (type === 'internal') loadInternalArticles();
+
+  // 挿入ボタンの状態リセット
+  const btn = document.getElementById('btn-insert-link');
+  if (type !== 'internal') {
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+  }
 }
 
 function openLinkModal() {
@@ -1051,6 +1088,71 @@ function openLinkModal() {
 
 function closeLinkModal() {
   document.getElementById('link-modal').classList.remove('open');
+  selectedInternalArticle = null;
+}
+
+// ─── サイト内リンク ───────────────────────────────────────────────
+let internalArticlesCache = null;
+let selectedInternalArticle = null;
+
+async function loadInternalArticles() {
+  const list = document.getElementById('internal-article-list');
+  if (internalArticlesCache) { renderInternalList(internalArticlesCache); return; }
+  list.innerHTML = '<div style="padding:12px;text-align:center;font-size:12px;color:var(--text-muted);">読み込み中...</div>';
+  try {
+    const { articles } = await GitHubAPI.getArticles();
+    internalArticlesCache = articles.filter(a => a.status === 'published');
+    renderInternalList(internalArticlesCache);
+  } catch(e) {
+    list.innerHTML = `<div style="padding:12px;font-size:12px;color:var(--red-600);">取得失敗: ${e.message}</div>`;
+  }
+}
+
+function filterInternalArticles() {
+  if (!internalArticlesCache) return;
+  const q = document.getElementById('internal-search').value.trim().toLowerCase();
+  const filtered = q
+    ? internalArticlesCache.filter(a => a.title.toLowerCase().includes(q))
+    : internalArticlesCache;
+  renderInternalList(filtered);
+}
+
+function renderInternalList(articles) {
+  const list = document.getElementById('internal-article-list');
+  if (!articles.length) {
+    list.innerHTML = '<div style="padding:12px;text-align:center;font-size:12px;color:var(--text-muted);">記事が見つかりません</div>';
+    return;
+  }
+  list.innerHTML = articles.map(a => `
+    <div onclick="selectInternalArticle('${a.id}')"
+      style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;transition:background 0.1s;"
+      onmouseover="this.style.background='var(--red-50)'" onmouseout="this.style.background=''"
+      id="internal-item-${a.id}">
+      <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.title}</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${a.date || ''} ${(a.tags||[]).map(t=>`<span style="background:var(--red-50);border:1px solid var(--red-100);color:var(--red-700);border-radius:20px;padding:0 5px;font-size:10px;">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+function selectInternalArticle(id) {
+  const articles = internalArticlesCache || [];
+  selectedInternalArticle = articles.find(a => a.id === id);
+  if (!selectedInternalArticle) return;
+
+  // 選択状態を表示
+  const sel = document.getElementById('internal-selected');
+  sel.style.display = 'block';
+  sel.textContent = '✓ 選択中: ' + selectedInternalArticle.title;
+
+  // 挿入ボタンを有効化
+  const btn = document.getElementById('btn-insert-link');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+
+  // 選択行をハイライト
+  document.querySelectorAll('[id^="internal-item-"]').forEach(el => {
+    el.style.background = el.id === 'internal-item-' + id ? 'var(--red-50)' : '';
+    el.style.fontWeight = el.id === 'internal-item-' + id ? '700' : '';
+  });
 }
 
 // OGP取得（Cloudflare Worker経由）
@@ -1124,14 +1226,32 @@ function insertLink() {
     const image = ogpData?.image || '';
     html = `<div class="ogp-card-wrap" contenteditable="false">
   <button class="ogp-delete-btn" onclick="this.closest('.ogp-card-wrap').remove()" title="削除">✕</button>
-  <a href="${url}" target="_blank" rel="noopener noreferrer"
-    class="ogp-card"
-    style="display:flex;gap:0;border:1px solid var(--border,#e8e8e8);border-radius:10px;overflow:hidden;text-decoration:none;color:inherit;background:var(--gray-50,#fafafa);max-width:100%;">
+  <a href="${url}" target="_blank" rel="noopener noreferrer" class="ogp-card"
+    style="display:flex;gap:0;border:1px solid var(--border,#2a1010);border-radius:10px;overflow:hidden;text-decoration:none;color:inherit;background:#1a0808;max-width:100%;">
     ${image ? `<img src="${image}" alt="" style="width:120px;min-height:80px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
-    <div style="padding:12px 14px;min-width:0;flex:1;">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1a1a1a;">${title}</div>
-      ${desc ? `<div style="font-size:12px;color:#666;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;margin-bottom:4px;">${desc}</div>` : ''}
-      <div style="font-size:11px;color:#cc2222;">${site}</div>
+    <div class="ogp-card-body" style="padding:12px 14px;min-width:0;flex:1;">
+      <div class="ogp-card-title" style="font-size:14px;font-weight:700;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#cc2222;">${title}</div>
+      ${desc ? `<div class="ogp-card-desc" style="font-size:12px;color:rgba(255,255,255,0.75);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;margin-bottom:4px;">${desc}</div>` : ''}
+      <div class="ogp-card-site" style="font-size:11px;color:rgba(255,255,255,0.45);">${site}</div>
+    </div>
+  </a>
+</div><p></p>`;
+  } else if (linkType === 'internal') {
+    // サイト内リンク
+    if (!selectedInternalArticle) return;
+    const base = typeof BLOG_CONFIG !== 'undefined' ? '/' + BLOG_CONFIG.GITHUB_REPO : '';
+    const articleUrl = `${base}/article.html?id=${selectedInternalArticle.id}`;
+    const title = selectedInternalArticle.title;
+    const excerpt = selectedInternalArticle.excerpt || '';
+    const date = selectedInternalArticle.date || '';
+    html = `<div class="ogp-card-wrap" contenteditable="false">
+  <button class="ogp-delete-btn" onclick="this.closest('.ogp-card-wrap').remove()" title="削除">✕</button>
+  <a href="${articleUrl}" class="ogp-card"
+    style="display:flex;gap:0;border:1px solid var(--border,#2a1010);border-radius:10px;overflow:hidden;text-decoration:none;color:inherit;background:#1a0808;max-width:100%;">
+    <div class="ogp-card-body" style="padding:12px 14px;min-width:0;flex:1;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;">📄 サイト内記事　${date}</div>
+      <div class="ogp-card-title" style="font-size:14px;font-weight:700;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#cc2222;">${title}</div>
+      ${excerpt ? `<div class="ogp-card-desc" style="font-size:12px;color:rgba(255,255,255,0.75);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;">${excerpt}</div>` : ''}
     </div>
   </a>
 </div><p></p>`;
