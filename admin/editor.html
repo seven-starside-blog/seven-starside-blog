@@ -335,6 +335,11 @@
   }
   #edit-area .ogp-card-wrap:hover .ogp-delete-btn { display: flex; }
   #edit-area .ogp-card-wrap .ogp-delete-btn:hover { background: #e53e3e; }
+  /* OGPカードの色を継承に勝つよう!importantで固定 */
+  #edit-area .ogp-card { background: #1a0808 !important; color: #fff !important; text-decoration: none !important; }
+  #edit-area .ogp-card-title { color: #cc2222 !important; }
+  #edit-area .ogp-card-desc  { color: rgba(255,255,255,0.75) !important; }
+  #edit-area .ogp-card-site  { color: rgba(255,255,255,0.45) !important; }
   /* contenteditable のデフォルトスタイルリセット */
   #edit-area:focus { outline: none; }
   #edit-area div { margin: 0 0 8px; }
