@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プライバシーポリシー | ナナボシサイド★ブログ</title>
+<meta name="description" content="ナナボシサイド★ブログのプライバシーポリシーです。個人情報の取り扱い、Cookie、広告、免責事項についてご説明します。">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .page-hero {
+    background: linear-gradient(160deg, var(--red-900), #2a0404);
+    padding: 48px 20px 36px;
+    color: #fff;
+  }
+  .page-hero h1 { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+  .page-hero .updated { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 6px; }
+
+  .policy-body { padding: 40px 0 72px; }
+
+  /* 目次 */
+  .toc-card {
+    background: var(--red-50);
+    border: 1px solid var(--red-100);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+  .toc-card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+  .toc-list { list-style: none; padding: 0; counter-reset: toc; }
+  .toc-list li { counter-increment: toc; padding: 5px 0; border-bottom: 1px solid var(--red-100); font-size: 13px; }
+  .toc-list li:last-child { border-bottom: none; }
+  .toc-list a { color: var(--accent); text-decoration: none; }
+  .toc-list a:hover { text-decoration: underline; }
+  .toc-list li::before { content: counter(toc) ". "; color: var(--text-muted); font-size: 11px; }
+
+  /* セクション */
+  .policy-section {
+    margin-bottom: 48px;
+    scroll-margin-top: 72px;
+  }
+  .policy-section h2 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    padding: 10px 0 10px 14px;
+    border-left: 4px solid var(--accent);
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+  .policy-section h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 20px 0 8px;
+  }
+  .policy-section p {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .policy-section ul, .policy-section ol {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--text);
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+  .policy-section li { margin-bottom: 4px; }
+  .policy-section a { color: var(--accent); text-decoration: underline; }
+  .policy-section a:hover { opacity: 0.8; }
+
+  /* 区切り */
+  .policy-divider { height: 1px; background: var(--border); margin: 48px 0; }
+
+  /* お問い合わせカード */
+  .contact-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 16px;
+  }
+  .contact-card p { margin-bottom: 8px; }
+
+  /* 更新履歴 */
+  .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .history-table th, .history-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+  .history-table th { background: var(--gray-50); font-weight: 600; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="./" class="logo">ナナボシサイド<span>★</span>ブログ</a>
+  <button class="hamburger" id="hamburgerBtn" aria-label="メニューを開く">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<main class="page-body">
+  <div class="page-hero">
+    <div class="container">
+      <h1>プライバシーポリシー</h1>
+      <p class="updated" id="updated-date">最終更新日：</p>
+    </div>
+  </div>
+
+  <div class="policy-body">
+    <div class="container" style="max-width:740px;">
+
+      <!-- 前文 -->
+      <p style="font-size:14px;line-height:1.85;margin-bottom:32px;color:var(--text-muted);">
+        ナナボシサイド（以下「当ブログ」）は、本ウェブサイト上で提供するサービスにおける、ユーザーの個人情報の取り扱いについて、以下のとおりプライバシーポリシーを定めます。
+      </p>
+
+      <!-- 目次 -->
+      <div class="toc-card">
+        <h2>目次</h2>
+        <ol class="toc-list">
+          <li><a href="#personal-info">個人情報の取り扱いについて</a></li>
+          <li><a href="#cookie">Cookieについて</a></li>
+          <li><a href="#analytics">アクセス解析ツールについて</a></li>
+          <li><a href="#ads">広告について（Google AdSense）</a></li>
+          <li><a href="#affiliate">アフィリエイトについて</a></li>
+          <li><a href="#disclaimer">免責事項</a></li>
+          <li><a href="#copyright">著作権について</a></li>
+          <li><a href="#contact">お問い合わせ先</a></li>
+          <li><a href="#changes">プライバシーポリシーの変更</a></li>
+        </ol>
+      </div>
+
+      <!-- 1. 個人情報 -->
+      <section class="policy-section" id="personal-info">
+        <h2>1. 個人情報の取り扱いについて</h2>
+        <p>当ブログでは、お問い合わせの際にお名前・メールアドレス等の個人情報をご入力いただく場合があります。</p>
+        <p>取得した個人情報は以下の目的にのみ使用します。</p>
+        <ul>
+          <li>お問い合わせへの回答・連絡のため</li>
+          <li>サービスの提供・改善のため</li>
+        </ul>
+        <p>取得した個人情報は適切に管理し、法令に基づく場合を除き、第三者に提供・開示することはありません。ご本人の同意なく目的外に利用することもありません。</p>
+      </section>
+
+      <!-- 2. Cookie -->
+      <section class="policy-section" id="cookie">
+        <h2>2. Cookieについて</h2>
+        <p>当ブログでは、ユーザー体験の向上および利用状況の分析のために Cookie を使用しています。</p>
+        <h3>Cookieとは</h3>
+        <p>Cookie とは、ウェブサイトがブラウザを通じてお客様のデバイスに保存する小さなテキストファイルです。お客様が再度訪問した際に、以前の設定を記憶するために使用されます。</p>
+        <h3>当ブログが使用するCookie</h3>
+        <ul>
+          <li><strong>セッション管理用Cookie：</strong>ログイン状態の維持に使用します（管理者のみ）。</li>
+          <li><strong>アクセス解析用Cookie：</strong>Google Analytics によるアクセス状況の把握に使用します。</li>
+          <li><strong>広告配信用Cookie：</strong>Google AdSense による広告のパーソナライズに使用します。</li>
+        </ul>
+        <p>ブラウザの設定からCookieを無効化することができますが、一部のサービスが利用できなくなる場合があります。</p>
+      </section>
+
+      <!-- 3. アクセス解析 -->
+      <section class="policy-section" id="analytics">
+        <h2>3. アクセス解析ツールについて</h2>
+        <p>当ブログでは、Google Inc. が提供する「Google Analytics」を利用してアクセス状況を解析しています。</p>
+        <p>Google Analytics はデータの収集のために Cookie を使用しています。このデータは匿名で収集されており、個人を特定するものではありません。</p>
+        <p>Google Analytics の利用規約・プライバシーポリシーについては、以下をご参照ください。</p>
+        <ul>
+          <li><a href="https://marketingplatform.google.com/about/analytics/terms/jp/" target="_blank" rel="noopener noreferrer">Google Analytics 利用規約</a></li>
+          <li><a href="https://policies.google.com/privacy?hl=ja" target="_blank" rel="noopener noreferrer">Google プライバシーポリシー</a></li>
+        </ul>
+        <p>Google Analytics によるデータ収集を無効にしたい場合は、<a href="https://tools.google.com/dlpage/gaoptout?hl=ja" target="_blank" rel="noopener noreferrer">Google Analytics オプトアウトアドオン</a>をご利用ください。</p>
+      </section>
+
+      <!-- 4. 広告 -->
+      <section class="policy-section" id="ads">
+        <h2>4. 広告について（Google AdSense）</h2>
+        <p>当ブログでは、Google Inc. が提供する広告配信サービス「Google AdSense」を利用しています。</p>
+        <p>Google AdSense は、ユーザーの興味に基づいた広告を表示するために Cookie を使用することがあります。</p>
+        <ul>
+          <li>Google がCookieを使用することにより、ユーザーが当ブログや他のサイトにアクセスした際の情報に基づいて広告が配信されます。</li>
+          <li>ユーザーはGoogleの<a href="https://adssettings.google.com/u/0/authenticated" target="_blank" rel="noopener noreferrer">広告設定ページ</a>から、パーソナライズ広告を無効にすることができます。</li>
+          <li>Google AdSense に関する詳細は<a href="https://policies.google.com/technologies/ads?hl=ja" target="_blank" rel="noopener noreferrer">こちら</a>をご参照ください。</li>
+        </ul>
+      </section>
+
+      <!-- 5. アフィリエイト -->
+      <section class="policy-section" id="affiliate">
+        <h2>5. アフィリエイトについて</h2>
+        <p>当ブログでは、第三者配信のアフィリエイトプログラムを利用する場合があります。アフィリエイトリンクを経由して商品・サービスをご購入いただいた場合、当ブログが報酬を受け取ることがあります。</p>
+        <p>アフィリエイトリンクが含まれる記事はその旨を明記するよう努めます。商品・サービスの評価は報酬の有無にかかわらず、実際の体験や情報に基づいて行います。</p>
+      </section>
+
+      <!-- 6. 免責事項 -->
+      <section class="policy-section" id="disclaimer">
+        <h2>6. 免責事項</h2>
+        <h3>情報の正確性について</h3>
+        <p>当ブログの情報は、可能な限り正確・最新の内容を掲載するよう努めていますが、内容の正確性・完全性・最新性を保証するものではありません。掲載情報により生じたいかなる損害についても、当ブログは一切の責任を負いません。</p>
+        <h3>リンク先について</h3>
+        <p>当ブログからリンクしている外部サイトのコンテンツについては、各サイトの管理者が責任を負います。リンク先での損害について、当ブログは一切の責任を負いません。</p>
+        <h3>サービスの変更・中断について</h3>
+        <p>当ブログは、事前の通知なくコンテンツの変更・削除、またはサービスの停止・終了を行う場合があります。これによって生じた損害について、当ブログは一切の責任を負いません。</p>
+      </section>
+
+      <!-- 7. 著作権 -->
+      <section class="policy-section" id="copyright">
+        <h2>7. 著作権について</h2>
+        <p>当ブログに掲載されているテキスト・画像・その他コンテンツの著作権は、特に明記がない限り当ブログ管理人（ナナボシサイド）に帰属します。</p>
+        <p>無断転載・複製・改変等は著作権法により禁止されています。引用する場合は出典を明記し、常識の範囲内でお使いください。</p>
+      </section>
+
+      <!-- 8. お問い合わせ -->
+      <section class="policy-section" id="contact">
+        <h2>8. お問い合わせ先</h2>
+        <p>プライバシーポリシーに関するお問い合わせは、以下よりご連絡ください。</p>
+        <div class="contact-card">
+          <p><strong>ブログ名：</strong>ナナボシサイド★ブログ</p>
+          <p><strong>運営者：</strong>ナナボシサイド</p>
+          <p><strong>お問い合わせ：</strong>各SNSのDM、またはブログ内のお問い合わせフォームよりご連絡ください。</p>
+        </div>
+      </section>
+
+      <!-- 9. 変更 -->
+      <section class="policy-section" id="changes">
+        <h2>9. プライバシーポリシーの変更</h2>
+        <p>当ブログは、必要に応じて本プライバシーポリシーを変更することがあります。変更後のポリシーは本ページに掲載した時点から有効となります。</p>
+        <p>重要な変更がある場合はブログ内でお知らせします。</p>
+      </section>
+
+      <div class="policy-divider"></div>
+
+      <!-- 更新履歴 -->
+      <section class="policy-section">
+        <h2>改訂履歴</h2>
+        <table class="history-table">
+          <thead><tr><th>日付</th><th>内容</th></tr></thead>
+          <tbody id="history-tbody">
+            <tr><td id="first-date"></td><td>初版制定</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="./">トップ</a>
+    <a href="about.html">自己紹介</a>
+    <a href="articles.html">記事一覧</a>
+    <a href="privacy.html">プライバシーポリシー</a>
+  </div>
+  <div>© 2025 ナナボシサイド★ブログ</div>
+</footer>
+
+<script src="assets/app.js"></script>
+<script>
+initDrawer('privacy.html');
+
+// 今日の日付を表示
+const today = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+document.getElementById('updated-date').textContent = '最終更新日：' + today;
+document.getElementById('first-date').textContent = today;
+</script>
+</body>
+</html>
