@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>記事管理 | 管理画面</title>
+<script src="config.js"></script>
+<script src="auth-guard.js"></script>
+<style>
+  :root {
+    --red-900:#5a0808;--red-700:#aa1818;--red-600:#cc2222;--red-400:#f06060;
+    --red-100:#ffe0e0;--red-50:#fff1f1;
+    --gray-50:#fafafa;--gray-100:#f4f4f4;--gray-200:#e8e8e8;--gray-300:#d0d0d0;
+    --gray-500:#888;--gray-700:#444;--gray-900:#111;
+    --bg:#fff;--surface:#fafafa;--border:#e0e0e0;--text:#1a1a1a;--text-muted:#666;
+    --accent:#cc2222;--font:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
+  }
+  @media(prefers-color-scheme:dark){:root{--bg:#0f0f0f;--surface:#1a1a1a;--border:#2e2e2e;--text:#f0f0f0;--text-muted:#888;--gray-100:#222;--gray-200:#2e2e2e;--gray-300:#3e3e3e;--gray-50:#1a1a1a;--red-50:#1c0808;--red-100:#2e1010;}}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;display:flex;flex-direction:column;}
+
+  header{background:var(--red-900);color:#fff;padding:0 20px;height:52px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,0.3);}
+  header .logo{font-size:15px;font-weight:700;color:#fff;text-decoration:none;}
+  header .spacer{flex:1;}
+  .user-info{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.7);}
+  .avatar{width:28px;height:28px;border-radius:50%;background:var(--red-600);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;overflow:hidden;}
+
+  .page-body{flex:1;max-width:1000px;width:100%;margin:0 auto;padding:24px 16px;}
+
+  /* ナビタブ */
+  .nav-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px;}
+  .nav-tab{padding:10px 18px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;border:none;background:none;font-family:var(--font);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color 0.15s;}
+  .nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .nav-tab:hover:not(.active){color:var(--text);}
+
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* ツールバー */
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .btn-primary{padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background 0.15s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+  .btn-primary:hover{background:var(--red-700);}
+  .btn-ghost{padding:8px 14px;background:none;border:1px solid var(--border);border-radius:7px;font-size:13px;color:var(--text-muted);cursor:pointer;font-family:var(--font);transition:all 0.15s;}
+  .btn-ghost:hover{border-color:var(--gray-400);color:var(--text);background:var(--gray-50);}
+  .search-input{flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:var(--font);outline:none;}
+  .search-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(204,34,34,0.1);}
+
+  /* 記事テーブル */
+  .article-table{width:100%;border-collapse:collapse;}
+  .article-table th{text-align:left;padding:10px 12px;font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:0.05em;border-bottom:1px solid var(--border);background:var(--gray-50);}
+  .article-table td{padding:12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  .article-table tr:hover td{background:var(--gray-50);}
+  .article-table tr:last-child td{border-bottom:none;}
+  .article-title-cell{font-size:14px;font-weight:600;max-width:360px;}
+  .article-title-cell a{color:var(--text);text-decoration:none;}
+  .article-title-cell a:hover{color:var(--accent);}
+  .article-excerpt{font-size:12px;color:var(--text-muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:360px;}
+  .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+  .badge-published{background:var(--red-50);color:var(--red-700);border:1px solid var(--red-100);}
+  .badge-draft{background:var(--gray-100);color:var(--gray-500);border:1px solid var(--gray-200);}
+  .tag-chip{display:inline-block;background:var(--red-50);border:1px solid var(--red-100);color:var(--red-700);border-radius:20px;padding:1px 7px;font-size:11px;margin:1px;}
+  .actions{display:flex;gap:6px;white-space:nowrap;}
+  .btn-edit{padding:5px 12px;background:none;border:1px solid var(--border);border-radius:5px;font-size:12px;cursor:pointer;color:var(--text-muted);font-family:var(--font);transition:all 0.15s;}
+  .btn-edit:hover{border-color:var(--accent);color:var(--accent);background:var(--red-50);}
+  .btn-delete{padding:5px 12px;background:none;border:1px solid var(--border);border-radius:5px;font-size:12px;cursor:pointer;color:var(--text-muted);font-family:var(--font);transition:all 0.15s;}
+  .btn-delete:hover{border-color:#e53e3e;color:#e53e3e;background:#fff5f5;}
+
+  /* 空・ローディング */
+  .empty{text-align:center;padding:60px 20px;color:var(--text-muted);}
+  .empty .icon{font-size:40px;margin-bottom:12px;opacity:0.4;}
+  .loading{text-align:center;padding:40px;color:var(--text-muted);font-size:13px;}
+
+  /* 削除確認モーダル */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--bg);border-radius:12px;padding:24px;width:360px;max-width:95vw;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.15);}
+  .modal h3{font-size:16px;font-weight:700;margin-bottom:8px;}
+  .modal p{font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;}
+  .modal-actions{display:flex;gap:8px;}
+  .btn-cancel{flex:1;padding:9px;background:var(--gray-100);border:none;border-radius:7px;cursor:pointer;font-family:var(--font);font-size:13px;color:var(--text);}
+  .btn-danger{flex:1;padding:9px;background:#e53e3e;border:none;border-radius:7px;cursor:pointer;font-family:var(--font);font-size:13px;color:#fff;font-weight:700;}
+  .btn-danger:hover{background:#c53030;}
+
+  /* ステータスバー */
+  .status-bar{background:var(--gray-50);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--text-muted);margin-bottom:16px;display:flex;gap:16px;align-items:center;}
+  .status-bar strong{color:var(--text);}
+  .saving-indicator{margin-left:auto;font-size:11px;}
+  .saving-indicator.saving{color:var(--accent);}
+  .saving-indicator.saved{color:#22863a;}
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html" class="logo">管理画面</a>
+  <span style="color:rgba(255,255,255,0.3)">/</span>
+  <span style="font-size:13px;color:rgba(255,255,255,0.7)">記事管理</span>
+  <div class="spacer"></div>
+  <div class="user-info">
+    <div class="avatar" id="user-avatar">U</div>
+    <span id="user-name"></span>
+    <button onclick="adminLogout()" style="margin-left:8px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:5px;color:#fff;font-size:11px;padding:3px 8px;cursor:pointer;font-family:inherit;">ログアウト</button>
+  </div>
+</header>
+
+<!-- 削除確認モーダル -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal">
+    <h3>記事を削除しますか？</h3>
+    <p id="delete-modal-desc">この操作は取り消せません。</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDeleteModal()">キャンセル</button>
+      <button class="btn-danger" onclick="confirmDelete()">削除する</button>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+  <!-- タブ -->
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('articles')">📝 記事一覧</button>
+    <button class="nav-tab" onclick="showTab('profile')">👤 自己紹介</button>
+  </div>
+
+  <!-- 記事一覧タブ -->
+  <div class="tab-panel active" id="tab-articles">
+    <div class="toolbar">
+      <a href="editor.html" class="btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新規記事
+      </a>
+      <input type="text" class="search-input" id="article-search" placeholder="タイトルで検索..." oninput="filterArticles()">
+      <select class="btn-ghost" id="status-filter" onchange="filterArticles()" style="padding:8px 10px;">
+        <option value="">すべて</option>
+        <option value="published">公開済み</option>
+        <option value="draft">下書き</option>
+      </select>
+    </div>
+
+    <div class="status-bar">
+      <span>合計: <strong id="total-count">-</strong> 件</span>
+      <span>公開: <strong id="published-count">-</strong> 件</span>
+      <span>下書き: <strong id="draft-count">-</strong> 件</span>
+    </div>
+
+    <div id="articles-container">
+      <div class="loading">読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- 自己紹介タブ -->
+  <div class="tab-panel" id="tab-profile">
+    <div style="max-width:640px;">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">自己紹介ページの内容を編集します。変更は「保存する」で確定されます。</p>
+
+      <!-- ステータスバー -->
+      <div class="status-bar">
+        <span>自己紹介ページ設定</span>
+        <span class="saving-indicator" id="profile-save-status"></span>
+      </div>
+
+      <!-- 名前・タグライン -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px;letter-spacing:0.05em;">表示名</div>
+          <input type="text" id="profile-name" placeholder="ハンドルネーム" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:var(--font);outline:none;">
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px;letter-spacing:0.05em;">肩書き・一言</div>
+          <input type="text" id="profile-tagline" placeholder="例：ブログ管理人" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:var(--font);outline:none;">
+        </div>
+      </div>
+
+      <!-- 自己紹介文 -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px;letter-spacing:0.05em;">自己紹介文（HTML可）</div>
+        <textarea id="profile-intro" rows="5" placeholder="自己紹介文を入力..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:var(--font);outline:none;resize:vertical;line-height:1.6;"></textarea>
+      </div>
+
+      <!-- プロフィール項目 -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:8px;letter-spacing:0.05em;">プロフィール項目</div>
+        <div id="profile-rows" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <button onclick="addProfileRow()" style="margin-top:8px;padding:6px 12px;background:none;border:1px dashed var(--border);border-radius:6px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:var(--font);width:100%;">＋ 項目を追加</button>
+      </div>
+
+      <!-- SNSリンク -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:8px;letter-spacing:0.05em;">SNS・リンク</div>
+        <div id="sns-rows" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <button onclick="addSnsRow()" style="margin-top:8px;padding:6px 12px;background:none;border:1px dashed var(--border);border-radius:6px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:var(--font);width:100%;">＋ SNS・リンクを追加</button>
+      </div>
+
+      <button class="btn-primary" onclick="saveProfile()" style="width:100%;justify-content:center;padding:12px;">
+        自己紹介を保存する
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ユーザー情報
+const session = window.ADMIN_SESSION;
+if (session) {
+  document.getElementById('user-name').textContent = session.name || session.email;
+  if (session.picture) {
+    document.getElementById('user-avatar').innerHTML = `<img src="${session.picture}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  } else {
+    document.getElementById('user-avatar').textContent = (session.name || 'U').charAt(0).toUpperCase();
+  }
+}
+
+// タブ切替
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// =====================================================
+// 記事一覧
+// =====================================================
+let allArticles = [];
+let deleteTargetId = null;
+
+async function loadArticles() {
+  try {
+    const base = typeof BLOG_CONFIG !== 'undefined' ? `/${BLOG_CONFIG.GITHUB_REPO}` : '';
+    const res = await fetch(`${base}/data/articles.json?_=${Date.now()}`);
+    const json = await res.json();
+    allArticles = json.articles || [];
+  } catch(e) {
+    allArticles = [];
+  }
+  updateCounts();
+  renderArticles(allArticles);
+}
+
+function updateCounts() {
+  document.getElementById('total-count').textContent = allArticles.length;
+  document.getElementById('published-count').textContent = allArticles.filter(a => a.status === 'published').length;
+  document.getElementById('draft-count').textContent = allArticles.filter(a => a.status === 'draft').length;
+}
+
+function filterArticles() {
+  const q      = document.getElementById('article-search').value.trim().toLowerCase();
+  const status = document.getElementById('status-filter').value;
+  const filtered = allArticles.filter(a => {
+    const matchQ = !q || a.title.toLowerCase().includes(q);
+    const matchS = !status || a.status === status;
+    return matchQ && matchS;
+  });
+  renderArticles(filtered);
+}
+
+function renderArticles(list) {
+  const container = document.getElementById('articles-container');
+  if (!list.length) {
+    container.innerHTML = '<div class="empty"><div class="icon">📭</div><p>記事がありません</p></div>';
+    return;
+  }
+  const sorted = [...list].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  container.innerHTML = `
+    <table class="article-table">
+      <thead>
+        <tr>
+          <th>タイトル</th>
+          <th>タグ</th>
+          <th>日付</th>
+          <th>ステータス</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sorted.map(a => `
+          <tr>
+            <td class="article-title-cell">
+              <a href="editor.html?id=${a.id}">${a.title || '（タイトルなし）'}</a>
+              <div class="article-excerpt">${a.excerpt || ''}</div>
+            </td>
+            <td>${(a.tags || []).map(t => `<span class="tag-chip">${t}</span>`).join('')}</td>
+            <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">${a.date || ''}</td>
+            <td><span class="badge badge-${a.status || 'draft'}">${a.status === 'published' ? '公開' : '下書き'}</span></td>
+            <td class="actions">
+              <a href="editor.html?id=${a.id}" class="btn-edit">編集</a>
+              <button class="btn-delete" onclick="openDeleteModal('${a.id}', '${(a.title||'').replace(/'/g,"\\'")}')">削除</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>`;
+}
+
+// 削除モーダル
+function openDeleteModal(id, title) {
+  deleteTargetId = id;
+  document.getElementById('delete-modal-desc').textContent = `「${title}」を削除します。この操作は取り消せません。`;
+  document.getElementById('delete-modal').classList.add('open');
+}
+function closeDeleteModal() {
+  document.getElementById('delete-modal').classList.remove('open');
+  deleteTargetId = null;
+}
+async function confirmDelete() {
+  if (!deleteTargetId) return;
+  allArticles = allArticles.filter(a => a.id !== deleteTargetId);
+  await saveArticlesJson(allArticles);
+  closeDeleteModal();
+  updateCounts();
+  filterArticles();
+}
+
+async function saveArticlesJson(articles) {
+  // GitHub Contents API で保存（PAT必要）
+  // ローカルテスト中はコンソールに出力
+  console.log('保存:', articles);
+  // TODO: GitHub API実装後にここを有効化
+  // const base = `/${BLOG_CONFIG.GITHUB_REPO}`;
+  // await githubSave('data/articles.json', JSON.stringify({ articles }, null, 2));
+  alert('保存しました（GitHub API連携後に反映されます）');
+}
+
+document.getElementById('delete-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeDeleteModal();
+});
+
+// =====================================================
+// 自己紹介編集
+// =====================================================
+const SNS_SERVICES = [
+  { value: 'x',         label: 'X (Twitter)',  icon: '𝕏', placeholder: 'https://x.com/yourname' },
+  { value: 'instagram', label: 'Instagram',    icon: '📷', placeholder: 'https://instagram.com/yourname' },
+  { value: 'youtube',   label: 'YouTube',      icon: '▶',  placeholder: 'https://youtube.com/@yourname' },
+  { value: 'tiktok',    label: 'TikTok',       icon: '♪',  placeholder: 'https://tiktok.com/@yourname' },
+  { value: 'github',    label: 'GitHub',       icon: '⌥',  placeholder: 'https://github.com/yourname' },
+  { value: 'bluesky',   label: 'Bluesky',      icon: '🦋', placeholder: 'https://bsky.app/profile/yourname' },
+  { value: 'note',      label: 'note',         icon: '📓', placeholder: 'https://note.com/yourname' },
+  { value: 'threads',   label: 'Threads',      icon: '🧵', placeholder: 'https://threads.net/@yourname' },
+  { value: 'facebook',  label: 'Facebook',     icon: 'f',  placeholder: 'https://facebook.com/yourname' },
+  { value: 'linkedin',  label: 'LinkedIn',     icon: 'in', placeholder: 'https://linkedin.com/in/yourname' },
+  { value: 'website',   label: 'Webサイト',    icon: '🌐', placeholder: 'https://yourwebsite.com' },
+  { value: 'other',     label: 'その他',       icon: '🔗', placeholder: 'https://...' },
+];
+
+let profileData = null;
+
+async function loadProfile() {
+  try {
+    const base = typeof BLOG_CONFIG !== 'undefined' ? `/${BLOG_CONFIG.GITHUB_REPO}` : '';
+    const res = await fetch(`${base}/data/profile.json?_=${Date.now()}`);
+    profileData = await res.json();
+  } catch(e) {
+    profileData = { name:'', tagline:'', intro:'', profile:[], sns:[] };
+  }
+  renderProfileForm();
+}
+
+function renderProfileForm() {
+  const p = profileData;
+  document.getElementById('profile-name').value    = p.name    || '';
+  document.getElementById('profile-tagline').value = p.tagline || '';
+  document.getElementById('profile-intro').value   = p.intro   || '';
+  renderProfileRows(p.profile || []);
+  renderSnsRows(p.sns || []);
+}
+
+// プロフィール行
+function renderProfileRows(rows) {
+  const container = document.getElementById('profile-rows');
+  container.innerHTML = rows.map((r, i) => profileRowHTML(i, r.label, r.value)).join('');
+}
+function profileRowHTML(i, label='', value='') {
+  return `<div style="display:flex;gap:8px;align-items:center;" data-profile-row="${i}">
+    <input type="text" placeholder="ラベル（例：趣味）" value="${escHtml(label)}"
+      style="width:130px;flex-shrink:0;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:var(--font);outline:none;">
+    <input type="text" placeholder="内容" value="${escHtml(value)}"
+      style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;font-family:var(--font);outline:none;">
+    <button onclick="this.closest('[data-profile-row]').remove()"
+      style="padding:6px 8px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text-muted);font-size:14px;line-height:1;flex-shrink:0;">✕</button>
+  </div>`;
+}
+function addProfileRow() {
+  const container = document.getElementById('profile-rows');
+  const i = container.children.length;
+  container.insertAdjacentHTML('beforeend', profileRowHTML(i));
+}
+
+// SNS行
+function renderSnsRows(rows) {
+  const container = document.getElementById('sns-rows');
+  container.innerHTML = rows.map((r, i) => snsRowHTML(i, r.service, r.label, r.url)).join('');
+}
+function snsRowHTML(i, service='other', label='', url='') {
+  const svc = SNS_SERVICES.find(s => s.value === service) || SNS_SERVICES.at(-1);
+  const opts = SNS_SERVICES.map(s =>
+    `<option value="${s.value}" ${s.value === service ? 'selected' : ''}>${s.label}</option>`
+  ).join('');
+  return `<div style="display:flex;gap:8px;align-items:center;background:var(--gray-50);border:1px solid var(--border);border-radius:8px;padding:8px 10px;" data-sns-row="${i}">
+    <select onchange="updateSnsPlaceholder(this)"
+      style="width:130px;flex-shrink:0;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;font-family:var(--font);outline:none;">
+      ${opts}
+    </select>
+    <input type="text" placeholder="表示名（任意）" value="${escHtml(label)}"
+      style="width:110px;flex-shrink:0;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;font-family:var(--font);outline:none;">
+    <input type="url" placeholder="${svc.placeholder}" value="${escHtml(url)}"
+      style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;font-family:var(--font);outline:none;">
+    <button onclick="this.closest('[data-sns-row]').remove()"
+      style="padding:5px 8px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text-muted);font-size:14px;line-height:1;flex-shrink:0;">✕</button>
+  </div>`;
+}
+function addSnsRow() {
+  const container = document.getElementById('sns-rows');
+  const i = container.children.length;
+  container.insertAdjacentHTML('beforeend', snsRowHTML(i));
+}
+function updateSnsPlaceholder(sel) {
+  const svc = SNS_SERVICES.find(s => s.value === sel.value) || SNS_SERVICES.at(-1);
+  const urlInput = sel.closest('[data-sns-row]').querySelector('input[type="url"]');
+  if (urlInput) urlInput.placeholder = svc.placeholder;
+}
+
+function collectProfile() {
+  const profileRows = [...document.querySelectorAll('[data-profile-row]')].map(row => {
+    const inputs = row.querySelectorAll('input');
+    return { label: inputs[0].value.trim(), value: inputs[1].value.trim() };
+  }).filter(r => r.label || r.value);
+
+  const snsRows = [...document.querySelectorAll('[data-sns-row]')].map(row => {
+    const sel   = row.querySelector('select');
+    const inputs = row.querySelectorAll('input');
+    return { service: sel.value, label: inputs[0].value.trim(), url: inputs[1].value.trim() };
+  }).filter(r => r.url);
+
+  return {
+    name:      document.getElementById('profile-name').value.trim(),
+    tagline:   document.getElementById('profile-tagline').value.trim(),
+    intro:     document.getElementById('profile-intro').value,
+    profile:   profileRows,
+    sns:       snsRows,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+async function saveProfile() {
+  const data = collectProfile();
+  const statusEl = document.getElementById('profile-save-status');
+  statusEl.textContent = '保存中...';
+  statusEl.className = 'saving-indicator saving';
+  console.log('保存するプロフィール:', data);
+  // TODO: GitHub API実装後に有効化
+  await new Promise(r => setTimeout(r, 500));
+  statusEl.textContent = '保存しました ✓';
+  statusEl.className = 'saving-indicator saved';
+  setTimeout(() => { statusEl.textContent = ''; }, 3000);
+  alert('プロフィールを保存しました（GitHub API連携後に反映されます）');
+}
+
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// 初期化
+loadArticles();
+loadProfile();
+</script>
+</body>
+</html>
