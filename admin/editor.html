@@ -887,21 +887,72 @@ function execCmd(cmd) {
   updateWordCount();
 }
 
+// インラインstyle/classを子孫含め全除去するユーティリティ
+function stripStyles(el) {
+  el.removeAttribute('style');
+  el.removeAttribute('class');
+  el.querySelectorAll('[style],[class]').forEach(c => {
+    c.removeAttribute('style');
+    c.removeAttribute('class');
+  });
+  return el;
+}
+
+// area直下の最上位ブロックノードを返す
+function getTopBlock(area) {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return null;
+  let node = sel.getRangeAt(0).commonAncestorContainer;
+  // テキストノードの場合は親へ
+  if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+  // area直下まで遡る
+  while (node && node !== area && node.parentNode !== area) {
+    node = node.parentNode;
+  }
+  return (node && node !== area) ? node : null;
+}
+
+// 選択範囲にまたがるarea直下のブロック一覧を返す
+function getSelectedTopBlocks(area) {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return [];
+  const range = sel.getRangeAt(0);
+
+  // 選択が1つのブロック内に収まるケース
+  const single = getTopBlock(area);
+  if (single) {
+    // rangeがそのノード内だけか確認
+    if (single.contains(range.startContainer) && single.contains(range.endContainer)) {
+      return [single];
+    }
+  }
+
+  // 複数ブロックにまたがる: area直下の子ノードのうち選択範囲と交差するものを収集
+  const blocks = [];
+  for (const child of area.childNodes) {
+    if (child.nodeType === Node.TEXT_NODE) continue;
+    const childRange = document.createRange();
+    childRange.selectNode(child);
+    if (range.compareBoundaryPoints(Range.END_TO_START, childRange) < 0 &&
+        range.compareBoundaryPoints(Range.START_TO_END, childRange) > 0) {
+      blocks.push(child);
+    }
+  }
+  return blocks.length ? blocks : (single ? [single] : []);
+}
+
 function applyBlockStyle(tag) {
   if (!tag) return;
   const area = document.getElementById('edit-area');
   area.focus();
 
   const sel = window.getSelection();
-  if (!sel.rangeCount) return;
+  if (!sel || !sel.rangeCount) return;
 
-  // カーソルのある最上位ブロック要素を探す
-  let node = sel.getRangeAt(0).commonAncestorContainer;
-  while (node && node.parentNode !== area) {
-    node = node.parentNode;
-  }
-  if (!node || node === area) {
-    // 選択なし→直接insertHTMLで新規段落追加
+  const blocks = getSelectedTopBlocks(area);
+
+  if (!blocks.length) {
+    // カーソルがどこにもなければ新規挿入
     if (tag === 'pre') {
       document.execCommand('insertHTML', false, '<pre><code>コードを入力</code></pre>');
     } else {
@@ -911,35 +962,29 @@ function applyBlockStyle(tag) {
     return;
   }
 
-  if (tag === 'pre') {
-    // preは既存ノードをラップ
-    const pre = document.createElement('pre');
-    const code = document.createElement('code');
-    code.textContent = node.innerText || node.textContent || 'コードを入力';
-    pre.appendChild(code);
-    // styleを一切付けない
-    node.replaceWith(pre);
-    // カーソルをcodeの末尾に
+  // 選択範囲にまたがる全ブロックを変換
+  let lastEl = null;
+  for (const node of blocks) {
+    if (tag === 'pre') {
+      const pre = document.createElement('pre');
+      const code = document.createElement('code');
+      code.textContent = node.innerText || node.textContent || '';
+      pre.appendChild(code);
+      node.replaceWith(pre);
+      lastEl = code;
+    } else {
+      const newEl = document.createElement(tag);
+      newEl.innerHTML = node.innerHTML || '';
+      stripStyles(newEl);
+      node.replaceWith(newEl);
+      lastEl = newEl;
+    }
+  }
+
+  // カーソルを最後の要素の末尾へ
+  if (lastEl) {
     const r = document.createRange();
-    r.selectNodeContents(code);
-    r.collapse(false);
-    sel.removeAllRanges();
-    sel.addRange(r);
-  } else {
-    // 新しい要素に内容を移してstyle/class完全リセット
-    const newEl = document.createElement(tag);
-    newEl.innerHTML = node.innerHTML || '';
-    // 子孫のインラインstyle・classをすべて除去（行間・フォントサイズ残留を防ぐ）
-    newEl.removeAttribute('style');
-    newEl.removeAttribute('class');
-    newEl.querySelectorAll('[style],[class]').forEach(el => {
-      el.removeAttribute('style');
-      el.removeAttribute('class');
-    });
-    node.replaceWith(newEl);
-    // カーソルを末尾に
-    const r = document.createRange();
-    r.selectNodeContents(newEl);
+    r.selectNodeContents(lastEl);
     r.collapse(false);
     sel.removeAllRanges();
     sel.addRange(r);
@@ -1178,6 +1223,24 @@ function setStatus(status) {
 
 // === 文字数カウント ===
 const editArea = document.getElementById('edit-area');
+
+// ペースト: プレーンテキストのみ受け付け、スタイルを除去
+editArea.addEventListener('paste', (e) => {
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+  if (!text) return;
+  // 改行を <br> に変換して挿入
+  const html = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n\n+/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  document.execCommand('insertHTML', false, `<p>${html}</p>`);
+  updateWordCount();
+  scheduleAutoSave();
+});
+
 editArea.addEventListener('input', () => {
   updateWordCount();
   scheduleAutoSave();
