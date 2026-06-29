@@ -21,7 +21,7 @@
   const session = getSession();
   if (!isValid(session)) {
     const expired = session && !isValid(session);
-    window.location.href = 'index.html' + (expired ? '?error=expired' : '');
+    window.location.href = 'a3v1nh41reh837e4.html' + (expired ? '?error=expired' : '');
   }
 
   // グローバルに公開（各ページから利用可）
@@ -30,6 +30,6 @@
   // ログアウト関数
   window.adminLogout = function() {
     sessionStorage.removeItem('admin_session');
-    window.location.href = 'index.html';
+    window.location.href = 'a3v1nh41reh837e4.html';
   };
 })();
