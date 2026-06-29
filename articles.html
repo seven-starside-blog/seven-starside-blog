@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>記事一覧 | ナナボシサイド★ブログ</title>
-<link rel="stylesheet" href="/seven-starside-blog/assets/style.css">
-<script src="/seven-starside-blog/admin/config.js"></script>
+<title>記事一覧 | seven-starside-blog</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="admin/config.js"></script>
 <style>
   .page-hero {
     background: linear-gradient(160deg, var(--red-900), #2a0404);
@@ -75,7 +75,7 @@
 <body>
 
 <header class="site-header">
-  <a href="/seven-starside-blog/" class="logo">ナナボシサイド<span>★</span>ブログ</a>
+  <a href="./" class="logo">seven<span>★</span>starside</a>
   <button class="hamburger" id="hamburgerBtn" aria-label="メニューを開く">
     <span></span><span></span><span></span>
   </button>
@@ -124,14 +124,14 @@
 
 <footer class="site-footer">
   <div class="footer-links">
-    <a href="/seven-starside-blog/">トップ</a>
-    <a href="/seven-starside-blog/about.html">自己紹介</a>
-    <a href="/seven-starside-blog/articles.html">記事一覧</a>
+    <a href="./">トップ</a>
+    <a href="about.html">自己紹介</a>
+    <a href="articles.html">記事一覧</a>
   </div>
   <div>© 2025 seven-starside-blog</div>
 </footer>
 
-<script src="/seven-starside-blog/assets/app.js"></script>
+<script src="assets/app.js"></script>
 <script>
 initDrawer('articles.html');
 
@@ -211,7 +211,7 @@ function renderArticles() {
       ? `<div class="ad-unit ad-inline">広告スペース</div>`
       : '';
     return ad + `
-      <a href="/seven-starside-blog/article.html?id=${a.id}" class="article-card">
+      <a href="${REPO_BASE}/article.html?id=${a.id}" class="article-card">
         <div class="thumb">${a.thumbnail ? `<img src="${a.thumbnail}" alt="">` : '✦'}</div>
         <div class="card-body">
           <div class="card-date">${formatDate(a.date)}</div>
