@@ -66,5 +66,17 @@ const GitHubAPI = (() => {
     return await putFile('data/profile.json', profile, sha, message);
   }
 
-  return { getFile, putFile, getArticles, saveArticles, getProfile, saveProfile };
+  // ─── OGP取得 ──────────────────────────────────────────────────────
+  async function fetchOgp(targetUrl) {
+    const url = `${workerUrl()}/api/ogp?url=${encodeURIComponent(targetUrl)}`;
+    const res = await fetch(url, { method: 'GET' });
+    if (!res.ok) {
+      let msg = `OGP取得失敗 (${res.status})`;
+      try { const d = await res.json(); msg = d.error || msg; } catch {}
+      throw new Error(msg);
+    }
+    return await res.json(); // { url, title, desc, image, site }
+  }
+
+  return { getFile, putFile, getArticles, saveArticles, getProfile, saveProfile, fetchOgp };
 })();
