@@ -227,13 +227,23 @@ let articlesSha = null;  // GitHub API用SHA
 let profileSha  = null;
 
 async function loadArticles() {
+  const container = document.getElementById('articles-container');
+  container.innerHTML = '<div class="loading">読み込み中...</div>';
   try {
     const { articles, sha } = await GitHubAPI.getArticles();
     allArticles = articles;
     articlesSha = sha;
   } catch(e) {
-    console.warn('記事取得失敗（ローカル確認中は正常）:', e.message);
+    console.error('記事取得失敗:', e);
+    container.innerHTML = `<div class="empty">
+      <div class="icon">⚠️</div>
+      <p>記事の取得に失敗しました</p>
+      <p style="font-size:12px;margin-top:6px;color:var(--gray-500);">${e.message}</p>
+      <button onclick="loadArticles()" style="margin-top:12px;padding:7px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;">再試行</button>
+    </div>`;
     allArticles = [];
+    updateCounts();
+    return;
   }
   updateCounts();
   renderArticles(allArticles);
@@ -361,7 +371,10 @@ async function loadProfile() {
     profileData = profile;
     profileSha  = sha;
   } catch(e) {
-    console.warn('プロフィール取得失敗（ローカル確認中は正常）:', e.message);
+    console.error('プロフィール取得失敗:', e);
+    const s = document.getElementById('profile-save-status');
+    s.textContent = 'プロフィール取得失敗: ' + e.message;
+    s.className = 'saving-indicator saving';
     profileData = { name:'', tagline:'', intro:'', profile:[], sns:[] };
   }
   renderProfileForm();
