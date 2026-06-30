@@ -33,16 +33,23 @@
   /* レイアウト */
   .article-layout {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 32px;
     padding: 36px 0 60px;
   }
   @media (min-width: 900px) {
-    .article-layout { grid-template-columns: 1fr 240px; }
+    .article-layout { grid-template-columns: minmax(0, 1fr) 240px; }
   }
 
   /* 本文 */
-  .article-body { font-size: 16px; line-height: 1.9; color: var(--text); }
+  .article-body {
+    font-size: 16px; line-height: 1.9; color: var(--text);
+    /* 長いURLや英数字でもコンテナ幅をはみ出さないよう折り返す */
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+  }
+  .article-body a { overflow-wrap: break-word; word-break: break-word; }
   .article-body h1 { font-size: 24px; font-weight: 700; margin: 32px 0 12px; }
   .article-body h2 {
     font-size: 20px; font-weight: 700; margin: 28px 0 10px;
@@ -101,7 +108,7 @@
   }
   .nav-btn:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(204,34,34,0.1); }
   .nav-btn .nav-dir { font-size: 11px; color: var(--accent); font-weight: 600; }
-  .nav-btn .nav-title { font-size: 13px; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .nav-btn .nav-title { font-size: 13px; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
   .nav-btn.next { text-align: right; }
   .nav-btn.prev { text-align: left; }
 
@@ -127,7 +134,7 @@
   }
   .recommend-card .thumb-mini img { width: 100%; height: 100%; object-fit: cover; }
   .recommend-card .info .date { font-size: 11px; color: var(--text-muted); }
-  .recommend-card .info .title { font-size: 13px; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .recommend-card .info .title { font-size: 13px; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
 
   /* サイドバー */
   .sidebar { display: flex; flex-direction: column; gap: 20px; }
@@ -186,12 +193,10 @@
 <body>
 
 <header class="site-header">
-  <div class="site-header-inner">
   <a href="./" class="logo">seven<span>★</span>starside</a>
   <button class="hamburger" id="hamburgerBtn" aria-label="メニューを開く">
     <span></span><span></span><span></span>
   </button>
-  </div>
 </header>
 
 <main class="page-body" id="main-content">
@@ -201,7 +206,6 @@
 </main>
 
 <footer class="site-footer">
-  <div class="site-footer-inner">
   <div class="footer-links">
     <a href="./">トップ</a>
     <a href="about.html">自己紹介</a>
@@ -209,7 +213,6 @@
     <a href="privacy.html">プライバシーポリシー</a>
   </div>
   <div>© 2025 ナナボシサイド★ブログ</div>
-  </div>
 </footer>
 
 <script src="assets/app.js"></script>
