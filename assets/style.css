@@ -112,6 +112,42 @@ img { max-width: 100%; height: auto; display: block; }
 .empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
 .empty-state p { font-size: 14px; }
 
+/* =============================================
+   スマホ対応（共通）
+   ============================================= */
 @media (max-width: 600px) {
-  .container { padding: 0 14px; }
+  :root { --header-h: 52px; }
+
+  .container { padding: 0 16px; }
+
+  /* ヘッダー */
+  .site-header { padding: 0 14px; }
+  .site-header .logo { font-size: 16px; }
+
+  /* ドロワー */
+  .drawer { width: 80vw; max-width: 300px; }
+
+  /* 記事カードグリッド：1カラムに */
+  .articles-grid { grid-template-columns: 1fr; gap: 12px; }
+
+  .article-card .card-body { padding: 14px; }
+  .article-card .card-title { font-size: 15px; }
+  .article-card .card-excerpt { font-size: 12.5px; }
+
+  /* フッター */
+  .site-footer { padding: 24px 16px; font-size: 12px; }
+  .footer-links { gap: 14px; font-size: 12.5px; flex-wrap: wrap; }
+
+  /* 広告 */
+  .ad-unit { min-height: 70px; font-size: 11px; margin: 16px 0; }
+
+  /* 空状態・ローディング */
+  .empty-state { padding: 40px 16px; }
+  .empty-state .icon { font-size: 36px; }
+  .loading-spinner { padding: 40px 0; }
+}
+
+/* タブレット〜小型ノート */
+@media (max-width: 900px) and (min-width: 601px) {
+  .articles-grid { grid-template-columns: repeat(2, 1fr); }
 }
