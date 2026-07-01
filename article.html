@@ -177,6 +177,8 @@
   .toc-inline a:hover { color: var(--accent); }
   @media (max-width: 899px) {
     .toc-inline { display: block; }
+    /* スマホではサイドバー目次を非表示（インライン目次に切替） */
+    .toc-sidebar-card { display: none; }
   }
   .sidebar-sticky { position: sticky; top: calc(var(--header-h) + 16px); }
   /* OGPカード（記事本文内） */
@@ -345,7 +347,7 @@ initDrawer('articles.html');
     const items = h2Matches.map((m,i) =>
       `<li><a href="#heading-${i}">${m[1]}</a></li>`
     ).join('');
-    return `<div class="sidebar-card">
+    return `<div class="sidebar-card toc-sidebar-card">
       <h3>目次</h3>
       <ul class="toc-list">
         ${overviewItem}${items}
