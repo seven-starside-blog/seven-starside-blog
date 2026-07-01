@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://seven-starside-blog.github.io/seven-starside-blog/sitemap.xml
