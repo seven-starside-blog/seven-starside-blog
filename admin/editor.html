@@ -1341,21 +1341,30 @@ function insertLink() {
 document.getElementById('link-url').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fetchOgp(); } });
 
 // === 画像挿入 ===
-// GoogleドライブのURLを直接表示可能な形式に変換
-function normalizeImageUrl(url) {
-  if (!url) return url;
-  // パターン1: /file/d/FILE_ID/view
-  const m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (m1) return `https://drive.google.com/uc?export=view&id=${m1[1]}`;
-  // パターン2: uc?export=view&id=FILE_ID（そのまま使えるが念のため正規化）
-  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (m2 && url.includes('drive.google.com')) {
-    return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
+// GoogleドライブのURLをWorkerプロキシ経由に変換
+function normalizeImageUrl(rawUrl) {
+  if (!rawUrl) return rawUrl;
+
+  // GoogleドライブのファイルIDを抽出
+  let fileId = null;
+  const m1 = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m1) fileId = m1[1];
+  const m2 = rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (!fileId && m2 && rawUrl.includes('drive.google.com')) fileId = m2[1];
+  const m3 = rawUrl.match(/open\?id=([a-zA-Z0-9_-]+)/);
+  if (!fileId && m3) fileId = m3[1];
+
+  if (fileId) {
+    // Worker経由でプロキシ（CORSを回避）
+    const driveUrl = 'https://drive.google.com/uc?export=view&id=' + fileId;
+    if (typeof BLOG_CONFIG !== 'undefined' && BLOG_CONFIG.WORKER_URL &&
+        !BLOG_CONFIG.WORKER_URL.includes('YOUR_WORKER')) {
+      return BLOG_CONFIG.WORKER_URL.replace(/\/$/, '') + '/api/image?url=' + encodeURIComponent(driveUrl);
+    }
+    // WorkerURL未設定の場合は直接URL（表示されないかもしれないが挿入はできる）
+    return driveUrl;
   }
-  // パターン3: open?id=FILE_ID
-  const m3 = url.match(/open\?id=([a-zA-Z0-9_-]+)/);
-  if (m3) return `https://drive.google.com/uc?export=view&id=${m3[1]}`;
-  return url;
+  return rawUrl;
 }
 
 function insertImage() {
