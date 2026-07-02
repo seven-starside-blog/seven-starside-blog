@@ -65,6 +65,8 @@
     border-radius: 6px;
     overflow: hidden;
   }
+  /* 閲覧側では削除ボタンを完全非表示 */
+  .article-body .split-block-wrap .split-delete-btn { display: none !important; }
   .article-body .split-row { display: table-row; }
   .article-body .split-dt,
   .article-body .split-dd {
@@ -73,9 +75,13 @@
     border-bottom: 1px solid var(--border);
     vertical-align: top;
     word-break: break-word;
-    white-space: pre-wrap;
+    white-space: normal;
     line-height: 1.7;
   }
+  .article-body .split-dt div,
+  .article-body .split-dt p,
+  .article-body .split-dd div,
+  .article-body .split-dd p { margin: 0; padding: 0; line-height: 1.7; }
   .article-body .split-row:last-child .split-dt,
   .article-body .split-row:last-child .split-dd { border-bottom: none; }
   .article-body .split-dt {
@@ -89,7 +95,7 @@
   }
   .article-body .split-dd {
     border-left: 2px solid var(--red-400);
-    white-space: pre-wrap;
+    white-space: normal;
   }
 
   /* 本文 */
