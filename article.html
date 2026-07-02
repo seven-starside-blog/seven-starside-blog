@@ -52,6 +52,46 @@
     .article-layout { grid-template-columns: minmax(0, 1fr) 240px; }
   }
 
+  /* ── 2カラム分割ブロック（閲覧側） ── */
+  .article-body .split-block {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    border-left: 3px solid var(--red-400);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .article-body .split-row { display: table-row; }
+  .article-body .split-dt,
+  .article-body .split-dd {
+    display: table-cell;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    word-break: break-word;
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+  .article-body .split-row:last-child .split-dt,
+  .article-body .split-row:last-child .split-dd { border-bottom: none; }
+  .article-body .split-dt {
+    width: 1%;
+    white-space: nowrap;
+    font-style: italic;
+    font-weight: 700;
+    color: var(--red-400);
+    background: rgba(204,34,34,0.04);
+    min-width: 60px;
+  }
+  .article-body .split-dd {
+    border-left: 2px solid var(--red-400);
+    white-space: pre-wrap;
+  }
+
   /* 本文 */
   .article-body {
     font-size: 16px; line-height: 1.9; color: var(--text);
@@ -91,7 +131,17 @@
   .article-body pre code { background: none; border: none; color: inherit; }
   .article-body ul, .article-body ol { padding-left: 24px; margin: 8px 0 16px; }
   .article-body li { margin-bottom: 4px; }
-  .article-body img { border-radius: 8px; margin: 16px 0; max-width: 100%; }
+  .article-body img { border-radius: 8px; margin: 16px 0; max-width: 100%; display: block; }
+  .article-body figure { margin: 16px 0; padding: 0; }
+  .article-body figure img { margin: 0; }
+  .article-body figure p {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 4px 0 0;
+    line-height: 1.5;
+  }
+  .article-body figure p:first-child { margin: 0 0 4px; }
   .article-body hr { border: none; border-top: 2px solid var(--red-100); margin: 24px 0; }
   .article-body table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
   .article-body th, .article-body td { padding: 10px 12px; border: 1px solid var(--border); text-align: left; }
