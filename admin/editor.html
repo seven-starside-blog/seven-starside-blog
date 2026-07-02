@@ -392,14 +392,27 @@
     border-bottom: 1px solid var(--border);
     vertical-align: top;
     word-break: break-word;
-    white-space: pre-wrap;
+    /* white-space: pre-wrap は使わず、通常の折り返しで統一した行間を保つ */
+    white-space: normal;
     line-height: 1.7;
     outline: none;
   }
+  /* contenteditable内でブラウザが挿入するdiv/p/brの行間をリセット */
+  #edit-area .split-dt div,
+  #edit-area .split-dt p,
+  #edit-area .split-dd div,
+  #edit-area .split-dd p {
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+    min-height: 1.7em;
+  }
+  #edit-area .split-dt br,
+  #edit-area .split-dd br { line-height: 1.7; }
   #edit-area .split-row:last-child .split-dt,
   #edit-area .split-row:last-child .split-dd { border-bottom: none; }
   #edit-area .split-dt {
-    width: 1%;              /* 内容に合わせた最小幅（table-cellなので全行統一） */
+    width: 1%;
     white-space: nowrap;
     font-style: italic;
     font-weight: 700;
@@ -409,7 +422,7 @@
   }
   #edit-area .split-dd {
     border-left: 2px solid var(--red-400);
-    white-space: pre-wrap;
+    white-space: normal;
   }
   /* フォーカスのハイライト */
   #edit-area .split-dt:focus { background: rgba(204,34,34,0.08); }
