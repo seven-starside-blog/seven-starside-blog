@@ -807,6 +807,36 @@
 </div>
 
 <!-- トースト -->
+<!-- モーダル：画像挿入 -->
+<div class="modal-overlay" id="image-modal">
+  <div class="modal" style="width:380px;max-width:95vw;">
+    <h3>画像を挿入</h3>
+    <div class="field" style="margin-bottom:12px;">
+      <label style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px;">画像URL</label>
+      <input type="text" id="image-url-input" placeholder="https://... またはGoogleドライブのURL">
+    </div>
+    <div class="field" style="margin-bottom:12px;">
+      <label style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px;">キャプション（任意）</label>
+      <input type="text" id="image-caption-input" placeholder="空欄の場合は表示しません">
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px;">キャプション位置</label>
+      <div style="display:flex;gap:8px;">
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;">
+          <input type="radio" name="caption-pos" value="below" checked> 下
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;">
+          <input type="radio" name="caption-pos" value="above"> 上
+        </label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeImageModal()">キャンセル</button>
+      <button class="btn-insert" onclick="doInsertImage()">挿入</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- メインレイアウト -->
@@ -1526,14 +1556,59 @@ function normalizeImageUrl(rawUrl) {
   return rawUrl;
 }
 
+let imageSavedRange = null;
+
 function insertImage() {
-  const rawUrl = prompt('画像URLを入力してください（GoogleドライブのURLも可）：');
-  if (!rawUrl) return;
-  const url = normalizeImageUrl(rawUrl.trim());
+  // カーソル位置を保存してモーダルを開く
+  const sel = window.getSelection();
+  imageSavedRange = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+  document.getElementById('image-url-input').value = '';
+  document.getElementById('image-caption-input').value = '';
+  document.querySelector('input[name="caption-pos"][value="below"]').checked = true;
+  document.getElementById('image-modal').classList.add('open');
+  document.getElementById('image-url-input').focus();
+}
+
+function closeImageModal() {
+  document.getElementById('image-modal').classList.remove('open');
+}
+
+function doInsertImage() {
+  const rawUrl  = document.getElementById('image-url-input').value.trim();
+  if (!rawUrl) { closeImageModal(); return; }
+  const url     = normalizeImageUrl(rawUrl);
+  const caption = document.getElementById('image-caption-input').value.trim();
+  const pos     = document.querySelector('input[name="caption-pos"]:checked').value;
+
+  const captionHTML = caption
+    ? '<p style="text-align:center;font-size:12px;color:var(--text-muted);margin:4px 0 0;">' + caption + '</p>'
+    : '';
+
+  let html;
+  if (caption && pos === 'above') {
+    html = '<figure style="margin:16px 0;padding:0;">'
+      + '<p style="text-align:center;font-size:12px;color:var(--text-muted);margin:0 0 4px;">' + caption + '</p>'
+      + '<img src="' + url + '" alt="' + caption + '" style="max-width:100%;border-radius:6px;display:block;">'
+      + '</figure>';
+  } else if (caption) {
+    html = '<figure style="margin:16px 0;padding:0;">'
+      + '<img src="' + url + '" alt="' + caption + '" style="max-width:100%;border-radius:6px;display:block;">'
+      + captionHTML
+      + '</figure>';
+  } else {
+    html = '<figure style="margin:16px 0;padding:0;">'
+      + '<img src="' + url + '" alt="画像" style="max-width:100%;border-radius:6px;display:block;">'
+      + '</figure>';
+  }
+
   document.getElementById('edit-area').focus();
-  document.execCommand('insertHTML', false,
-    '<img src="' + url + '" alt="画像" style="max-width:100%;border-radius:6px;">'
-  );
+  if (imageSavedRange) {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(imageSavedRange);
+  }
+  document.execCommand('insertHTML', false, html);
+  closeImageModal();
   updateWordCount();
 }
 
@@ -1875,6 +1950,9 @@ document.addEventListener('keydown', (e) => {
 // === モーダルクローズ（背景クリック） ===
 document.getElementById('link-modal').addEventListener('click', function(e) {
   if (e.target === this) closeLinkModal();
+});
+document.getElementById('image-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeImageModal();
 });
 </script>
 </body>
